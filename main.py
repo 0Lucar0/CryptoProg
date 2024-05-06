@@ -16,20 +16,21 @@ async def check_for_new_news():
     conn = sqlite3.connect('news.db')
     c = conn.cursor()
 
-    sent_news = set()  # Множество для отслеживания уже отправленных новостей
-
     while True:
-        # Получаем данные из базы данных
-        c.execute("SELECT * FROM News ORDER BY rowid DESC LIMIT 1")
-        new_news = c.fetchone()
+        # Получаем все новости из базы данных, у которых значение published равно 'no'
+        c.execute("SELECT * FROM News WHERE published=?", ('no',))
+        new_news_list = c.fetchall()
 
-        if new_news and new_news[1] not in sent_news:
+        for new_news in new_news_list:
+            # Опубликовываем новость в канале
             news_text = f"💸💰<b>{new_news[0]}.</b>💸💰\n\n{new_news[2]}"
             await send_message_with_photo(CHANNEL_ID, news_text, new_news[3])  # Отправляем сообщение с фотографией
-            sent_news.add(new_news[1])  # Добавляем ссылку на новость в множество отправленных новостей
 
-        await asyncio.sleep(2700)  # Ожидание одного часа перед следующей проверкой
+            # Обновляем статус новости в базе данных на "опубликовано в канале"
+            c.execute("UPDATE News SET published=? WHERE link=?", ('yes', new_news[1]))
+            conn.commit()  # Фиксируем изменения в базе данных
 
+        await asyncio.sleep(3600)  # Ожидание одного часа перед следующей проверкой
 
 if __name__ == '__main__':
     asyncio.run(check_for_new_news())

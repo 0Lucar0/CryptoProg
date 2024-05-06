@@ -9,7 +9,7 @@ c = conn.cursor()
 
 # Создаем таблицу для хранения новостей, если она еще не существует
 c.execute('''CREATE TABLE IF NOT EXISTS News
-             (title TEXT, link TEXT PRIMARY KEY, text_news TEXT, photo_link TEXT)''')
+             (title TEXT, link TEXT PRIMARY KEY, text_news TEXT, photo_link TEXT, published TEXT DEFAULT 'no')''')
 
 def save_news_text(news):
     for item in news:
@@ -30,23 +30,25 @@ def save_news_text(news):
             # Добавим отладочный вывод для проверки
             print(f"Title: {item['title']}, Link: {item['link']}, Text: {item['text_news']}, Photo Link: {item['photo_link']}")
 
-            # Сохраняем только ссылку на фотографию в базу данных
+            # Сохраняем только ссылку на фотографию в базе данных
             c.execute("INSERT OR IGNORE INTO News (title, link, text_news, photo_link) VALUES (?, ?, ?, ?)", (
                 item['title'],
                 item['link'],
                 item['text_news'],
                 item['photo_link']))
             conn.commit()
-            print(f"Новость \"{item['title']}\" сохранена в базу данных.")
+            print(f"Новость \"{item['title']}\" сохранена в базе данных.")
         except Exception as e:
             print(f"Error occurred while parsing news text: {e}")
+
 def main():
     url = "https://ru.investing.com/news/cryptocurrency-news"
     while True:
         news = get_news(url)
         save_news_text(news)
         print("Сканирование завершено. Ждем 60 секунд перед следующим сканированием...")
-        time.sleep(2700)  # Пауза в 60 секунд
+        time.sleep(60)  # Пауза в 60 секунд
+
 def get_news(url):
     headers = {
         "Accept": "*/*",
@@ -72,7 +74,6 @@ def get_news(url):
                 news_list.append(news_item)
 
     return news_list
-
 
 if __name__ == "__main__":
     main()
