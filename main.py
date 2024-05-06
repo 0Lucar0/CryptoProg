@@ -18,7 +18,7 @@ async def check_for_new_news():
 
     while True:
         # Получаем все новости из базы данных, у которых значение published равно 'no'
-        c.execute("SELECT * FROM News WHERE published=?", ('no',))
+        c.execute("SELECT * FROM News WHERE published=?", ('0',))
         new_news_list = c.fetchall()
 
         for new_news in new_news_list:
@@ -27,7 +27,7 @@ async def check_for_new_news():
             await send_message_with_photo(CHANNEL_ID, news_text, new_news[3])  # Отправляем сообщение с фотографией
 
             # Обновляем статус новости в базе данных на "опубликовано в канале"
-            c.execute("UPDATE News SET published=? WHERE link=?", ('yes', new_news[1]))
+            c.execute("UPDATE News SET published=? WHERE link=?", ('1', new_news[1]))
             conn.commit()  # Фиксируем изменения в базе данных
 
         await asyncio.sleep(3600)  # Ожидание одного часа перед следующей проверкой
