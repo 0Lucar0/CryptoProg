@@ -11,6 +11,7 @@ c = conn.cursor()
 c.execute('''CREATE TABLE IF NOT EXISTS News
              (title TEXT, link TEXT PRIMARY KEY, text_news TEXT, photo_link TEXT, published TEXT DEFAULT 'no')''')
 
+
 def save_news_text(news):
     for item in news:
         try:
@@ -19,16 +20,20 @@ def save_news_text(news):
             soup = BeautifulSoup(result, 'lxml')
 
             # Парсим текст новости, если он есть
-            text_news = soup.find(class_='article_WYSIWYG__O0uhw article_articlePage__UMz3q text-[18px] leading-8').find('p').text.strip()
+            text_news = soup.find(
+                class_='article_WYSIWYG__O0uhw article_articlePage__UMz3q text-[18px] leading-8').find('p').text.strip()
             item['text_news'] = text_news if text_news else ''  # Проверка на наличие текста новости
 
             # Парсим ссылку на фотографию
-            photo_div = soup.find('div', class_='mb-2 mt-4 sm:mb-6 sm:mt-8 relative h-[294px] w-full overflow-hidden bg-[#181C21] sm:h-[420px] xl:h-[441px]').find('img', class_='h-full w-full object-contain')
+            photo_div = soup.find('div',
+                                  class_='mb-2 mt-4 sm:mb-6 sm:mt-8 relative h-[294px] w-full overflow-hidden bg-[#181C21] sm:h-[420px] xl:h-[441px]').find(
+                'img', class_='h-full w-full object-contain')
             photo_link = photo_div['src'] if photo_div else ''
             item['photo_link'] = photo_link
 
             # Добавим отладочный вывод для проверки
-            print(f"Title: {item['title']}, Link: {item['link']}, Text: {item['text_news']}, Photo Link: {item['photo_link']}")
+            print(
+                f"Title: {item['title']}, Link: {item['link']}, Text: {item['text_news']}, Photo Link: {item['photo_link']}")
 
             # Сохраняем только ссылку на фотографию в базе данных
             c.execute("INSERT OR IGNORE INTO News (title, link, text_news, photo_link) VALUES (?, ?, ?, ?)", (
@@ -41,13 +46,15 @@ def save_news_text(news):
         except Exception as e:
             print(f"Error occurred while parsing news text: {e}")
 
+
 def main():
     url = "https://ru.investing.com/news/cryptocurrency-news"
     while True:
         news = get_news(url)
         save_news_text(news)
         print("Сканирование завершено. Ждем 60 секунд перед следующим сканированием...")
-        time.sleep(60)  # Пауза в 60 секунд
+        time.sleep(600)  # Пауза в 60 секунд
+
 
 def get_news(url):
     headers = {
@@ -74,6 +81,7 @@ def get_news(url):
                 news_list.append(news_item)
 
     return news_list
+
 
 if __name__ == "__main__":
     main()

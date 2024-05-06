@@ -30,7 +30,7 @@ async def check_for_new_news():
             c.execute("UPDATE News SET published=? WHERE link=?", ('1', new_news[1]))
             conn.commit()  # Фиксируем изменения в базе данных
 
-        await asyncio.sleep(3600)  # Ожидание одного часа перед следующей проверкой
+        await asyncio.sleep(900)  # Ожидание одного часа перед следующей проверкой
 
 if __name__ == '__main__':
     asyncio.run(check_for_new_news())
