@@ -7,7 +7,7 @@ CHANNEL_ID = -1001724660274
 bot = Bot(token=API_TOKEN, parse_mode=types.ParseMode.HTML)
 
 async def send_message(channel_id: int, text: str):
-    await bot.send_message(channel_id, text)
+    await bot.send_messagechannel_id, text)
 
 async def check_for_new_news():
     sent_news = set()
