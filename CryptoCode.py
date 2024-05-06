@@ -53,7 +53,7 @@ def main():
         news = get_news(url)
         save_news_text(news)
         print("Сканирование завершено. Ждем 60 секунд перед следующим сканированием...")
-        time.sleep(600)  # Пауза в 60 секунд
+        time.sleep(420)  # Пауза в 60 секунд
 
 
 def get_news(url):
